@@ -44,8 +44,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            docker build --tag=ml-microservice .
-            docker tag ml-microservice "nghiadoandai/ml-microservice:v1.0.0"
+            docker build --tag=ml-microservice:v1.0.0 .
   publish-latest:
     environment:
       IMAGE_NAME: nghiadoandai/building-on-ci
