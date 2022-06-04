@@ -39,7 +39,7 @@ jobs:
           command: |
             docker build --tag=ml-microservice .
             docker tag ml-microservice "nghiadoandai/ml-microservice:latest"
-            docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push "nghiadoandai/ml-microservice:latest"
 
 workflows:
