@@ -74,8 +74,6 @@ workflows:
               only: master
       - aws-eks/create-cluster:
           cluster-name: my-eks-demo
-          node-type: "t3.micro"
-          nodes: 2
       - test-cluster:
           cluster-name: my-eks-demo
           requires:
