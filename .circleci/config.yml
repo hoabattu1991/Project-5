@@ -61,6 +61,9 @@ jobs:
           cluster-name: << parameters.cluster-name >>
       - run:
           command: |
+            kubectl create deployment ml-microservice --image="$DOCKERHUB_REPOSITORY/ml-microservice:latest"
+            kubectl scale deployments ml-microservice --replicas=2
+            kubectl expose deployments/ml-microservice --type=LoadBalancer --port=80
             kubectl get services
           name: Test cluster
 
@@ -73,8 +76,8 @@ workflows:
             branches:
               only: master
       - aws-eks/create-cluster:
-          cluster-name: my-eks-demo
+          cluster-name: my-eks-cluster
       - test-cluster:
-          cluster-name: my-eks-demo
+          cluster-name: my-eks-cluster
           requires:
             - aws-eks/create-cluster
