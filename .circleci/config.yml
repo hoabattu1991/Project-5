@@ -4,9 +4,7 @@ jobs:
   test:
     docker:
       - image: python:3.7.3-stretch
-
     working_directory: ~/repo
-
     steps:
       - checkout
       - restore_cache:
@@ -14,40 +12,23 @@ jobs:
             - v1-dependencies-{{ checksum "requirements.txt" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-
       - run:
           name: install dependencies
           command: |
             python3 -m venv venv
             . venv/bin/activate
             make install
-
       - save_cache:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
-
       - run:
           name: run lint
           command: |
             . venv/bin/activate
             make lint
 
-  # build:
-  #   environment:
-  #     IMAGE_NAME: building-on-ci
-  #   docker:
-  #     - image: circleci/buildpack-deps:stretch
-  #   steps:
-  #     - checkout
-  #     - setup_remote_docker
-  #     - run:
-  #         name: Build Docker image
-  #         command: |
-  #           docker build --tag=ml-microservice:v1.0.0 .
   publish-latest:
-    environment:
-      IMAGE_NAME: nghiadoandai/building-on-ci
     docker:
       - image: circleci/buildpack-deps:stretch
     steps:
@@ -65,10 +46,6 @@ workflows:
   default:
     jobs:
       - test
-      # - build:
-      #     filters:
-      #       branches:
-      #         only: master
       - publish-latest:
           filters:
             branches:
