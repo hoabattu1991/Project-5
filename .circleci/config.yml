@@ -43,7 +43,9 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build Docker image
-          command: docker build -t $IMAGE_NAME:latest .
+          command: |
+            docker build --tag=ml-microservice .
+            docker tag ml-microservice "nghiadoandai/ml-microservice:v1.0.0"
   publish-latest:
     environment:
       IMAGE_NAME: nghiadoandai/building-on-ci
@@ -55,7 +57,8 @@ jobs:
           name: Publish Docker Image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push $IMAGE_NAME:latest
+            docker push "nghiadoandai/ml-microservice:v1.0.0"
+
 workflows:
   default:
     jobs:
