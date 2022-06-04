@@ -38,9 +38,9 @@ jobs:
           name: Publish Docker Image to Docker Hub
           command: |
             docker build --tag=ml-microservice .
-            docker tag ml-microservice "nghiadoandai/ml-microservice:latest"
+            docker tag ml-microservice "$DOCKERHUB_REPOSITORY/ml-microservice:latest"
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push "nghiadoandai/ml-microservice:latest"
+            docker push "$DOCKERHUB_REPOSITORY/ml-microservice:latest"
 
 workflows:
   default:
