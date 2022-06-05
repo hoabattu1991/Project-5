@@ -9,7 +9,7 @@ LOG.setLevel(logging.INFO)
 
 @app.route("/")
 def home():
-    html = f"<h1>Hello world. I'm a student from course Udacity</h1>"
+    html = f"<h1 style='text-align: center;'>Hello world. I'm a student from course Udacity</h1>"
     return html.format(format)
 
 

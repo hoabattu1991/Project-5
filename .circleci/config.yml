@@ -14,10 +14,8 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
       - run:
-          name: install dependencies
+          name: Install dependencies
           command: |
             python3 -m venv venv
             . venv/bin/activate
@@ -32,21 +30,36 @@ jobs:
             . venv/bin/activate
             make lint
 
-  publish-latest:
+  publish-image-latest:
     docker:
       - image: circleci/buildpack-deps:stretch
     steps:
       - checkout
       - setup_remote_docker
       - run:
-          name: Publish Docker Image to Docker Hub
+          name: Push docker image ml-microservice to dockerhub
           command: |
             docker build --tag=ml-microservice .
             docker tag ml-microservice "$DOCKERHUB_REPOSITORY/ml-microservice:latest"
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push "$DOCKERHUB_REPOSITORY/ml-microservice:latest"
 
-  test-cluster:
+  configure-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            yum -y install tar gzip wget
+      - run:
+          command: |
+            wget https://github.com/weaveworks/eksctl/releases/download/v0.100.0/eksctl_Linux_amd64.tar.gz
+            tar xvzf eksctl_Linux_amd64.tar.gz
+            mv eksctl /usr/local/bin
+            eksctl create cluster --name my-eks-cluster --nodes=3 --spot --instance-types=t3.micro --region=us-east-1 --zones=us-east-1a,us-east-1b
+
+  deploy-application:
     docker:
       - image: 'cimg/python:3.10'
     parameters:
@@ -60,6 +73,7 @@ jobs:
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: << parameters.cluster-name >>
       - run:
+          name: Deploy application to AWS EKS cluster
           command: |
             kubectl create deployment ml-microservice --image="$DOCKERHUB_REPOSITORY/ml-microservice:latest"
             sleep 20
@@ -67,24 +81,17 @@ jobs:
             sleep 20
             kubectl expose deployments/ml-microservice --type=LoadBalancer --port=80
             sleep 20
-            kubectl get services
-          name: Test cluster
+            kubectl get service ml-microservice
 
 workflows:
   default:
     jobs:
       - test
-      - publish-latest:
+      - publish-image-latest:
           requires:
             - test
-          filters:
-            branches:
-              only: master
-      - aws-eks/create-cluster:
-          requires:
-            - publish-latest
-          cluster-name: my-eks-cluster
-      - test-cluster:
+      - configure-infrastructure
+      - deploy-application:
           cluster-name: my-eks-cluster
           requires:
-            - aws-eks/create-cluster
+            - configure-infrastructure
