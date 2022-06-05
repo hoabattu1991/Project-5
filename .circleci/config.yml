@@ -75,9 +75,9 @@ workflows:
           filters:
             branches:
               only: master
-      - aws-eks/create-cluster:
-          cluster-name: my-eks-cluster
-      - test-cluster:
-          cluster-name: my-eks-cluster
-          requires:
-            - aws-eks/create-cluster
+      # - aws-eks/create-cluster:
+      #     cluster-name: my-eks-cluster
+      # - test-cluster:
+      #     cluster-name: my-eks-cluster
+      #     requires:
+      #       - aws-eks/create-cluster
