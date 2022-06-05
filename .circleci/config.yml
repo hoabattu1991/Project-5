@@ -81,6 +81,8 @@ workflows:
             branches:
               only: master
       - aws-eks/create-cluster:
+          requires:
+            - publish-latest
           cluster-name: my-eks-cluster
       - test-cluster:
           cluster-name: my-eks-cluster
