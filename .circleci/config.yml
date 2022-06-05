@@ -42,11 +42,8 @@ jobs:
           name: Publish Docker Image to Docker Hub
           command: |
             docker build --tag=ml-microservice .
-            sleep 10
             docker tag ml-microservice "$DOCKERHUB_REPOSITORY/ml-microservice:latest"
-            sleep 10
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            sleep 10
             docker push "$DOCKERHUB_REPOSITORY/ml-microservice:latest"
 
   test-cluster:
@@ -65,8 +62,11 @@ jobs:
       - run:
           command: |
             kubectl create deployment ml-microservice --image="$DOCKERHUB_REPOSITORY/ml-microservice:latest"
+            sleep 20
             kubectl scale deployments ml-microservice --replicas=2
+            sleep 20
             kubectl expose deployments/ml-microservice --type=LoadBalancer --port=80
+            sleep 20
             kubectl get services
           name: Test cluster
 
@@ -80,9 +80,9 @@ workflows:
           filters:
             branches:
               only: master
-      # - aws-eks/create-cluster:
-      #     cluster-name: my-eks-cluster
-      # - test-cluster:
-      #     cluster-name: my-eks-cluster
-      #     requires:
-      #       - aws-eks/create-cluster
+      - aws-eks/create-cluster:
+          cluster-name: my-eks-cluster
+      - test-cluster:
+          cluster-name: my-eks-cluster
+          requires:
+            - aws-eks/create-cluster
