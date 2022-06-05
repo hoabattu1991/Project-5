@@ -42,8 +42,11 @@ jobs:
           name: Publish Docker Image to Docker Hub
           command: |
             docker build --tag=ml-microservice .
+            sleep 10
             docker tag ml-microservice "$DOCKERHUB_REPOSITORY/ml-microservice:latest"
+            sleep 10
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            sleep 10
             docker push "$DOCKERHUB_REPOSITORY/ml-microservice:latest"
 
   test-cluster:
