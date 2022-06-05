@@ -72,6 +72,8 @@ workflows:
     jobs:
       - test
       - publish-latest:
+          requires:
+            - test
           filters:
             branches:
               only: master
