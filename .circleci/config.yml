@@ -57,7 +57,7 @@ jobs:
             wget https://github.com/weaveworks/eksctl/releases/download/v0.100.0/eksctl_Linux_amd64.tar.gz
             tar xvzf eksctl_Linux_amd64.tar.gz
             mv eksctl /usr/local/bin
-            eksctl create cluster --name my-eks-cluster --nodes=1 --spot --instance-types=t3.micro --region=us-east-1 --zones=us-east-1a,us-east-1b
+            eksctl create cluster --name my-eks-cluster --nodes=2 --spot --instance-types=t3.micro --region=us-east-1 --zones=us-east-1a,us-east-1b
 
   deploy-application:
     docker:
